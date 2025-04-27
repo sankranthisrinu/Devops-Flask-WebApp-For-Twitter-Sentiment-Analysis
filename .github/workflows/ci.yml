@@ -100,6 +100,6 @@ jobs:
         run: |
           git config --global user.email "srinu.java17@gmail.com"
           git config --global user.name "Srinivasa Teja Sankranthi"
-          git add helm/sentiment-app/values.yaml
+          git add helm/sentiment-app-chart/values.yaml
           git commit -m "Update tag in Helm chart"
           git push
