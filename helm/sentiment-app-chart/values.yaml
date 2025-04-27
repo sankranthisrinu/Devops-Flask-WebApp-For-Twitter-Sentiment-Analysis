@@ -2,17 +2,13 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# These name overrides ensure valid Helm release names
-nameOverride: "sentiment-app"
-fullnameOverride: "sentiment-app"
-
 replicaCount: 1
 
 image:
   repository: srinu17/sentiment-app
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "14696765022"
+  tag: "v1"
 
 ingress:
   enabled: false
