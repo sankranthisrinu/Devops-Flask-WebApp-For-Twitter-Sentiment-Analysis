@@ -1,6 +1,10 @@
-# Default values for go-web-app-chart.
+# Default values for sentiment-app chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+# These name overrides ensure valid Helm release names
+nameOverride: "sentiment-app"
+fullnameOverride: "sentiment-app"
 
 replicaCount: 1
 
