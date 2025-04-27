@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: sentiment-app
-        image: srinu17/sentiment-app:{{ .Values:image.tag }}
+        image: srinu17/sentiment-app:{{ .Values.image.tag }}
         ports:
         - containerPort: 5000
         resources:
