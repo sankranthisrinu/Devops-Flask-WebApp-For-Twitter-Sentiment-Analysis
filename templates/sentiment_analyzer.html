@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tweet Sentiment Analyzer</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: #f0f2f5;
+            overflow-x: hidden;
+            display: flex;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-header h3 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-header p {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        
+        .sidebar-menu {
+            margin-top: 20px;
+            flex-grow: 1;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255,255,255,0.2);
+            border-left: 4px solid #ff9800;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 15px;
+            font-size: 20px;
+        }
+        
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,0,0,0.2);
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,0,0,0.4);
+        }
+        
+        .logout-btn i {
+            margin-right: 10px;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .content-header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .content-header h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .content-header p {
+            color: #666;
+        }
+        
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 15px 20px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #4b6cb7;
+            box-shadow: 0 0 0 3px rgba(75, 108, 183, 0.2);
+            outline: none;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #3b5998 0%, #192841 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 89, 152, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #f5515f 0%, #a1051d 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #e04e5a 0%, #8f041a 100%);
+        }
+        
+        /* Results Section */
+        .results-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .result-card-header {
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .result-card-body {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .sentiment-value {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        
+        .report-text {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            margin: 5px 0;
+            text-align: left;
+        }
+        
+        /* Visualization Button */
+        .viz-btn-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .viz-btn {
+            background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 94, 98, 0.3);
+        }
+        
+        .viz-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 94, 98, 0.4);
+        }
+        
+        /* Demo Mode Banner */
+        .demo-mode-banner {
+            background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+            color: #333;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                overflow: hidden;
+            }
+            
+            .sidebar-header h3, .sidebar-header p, .sidebar-menu span {
+                display: none;
+            }
+            
+            .sidebar-menu a {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .sidebar-menu i {
+                margin-right: 0;
+            }
+            
+            .logout-btn span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Sentiment AI</h3>
+            <p>Tweet Analyzer</p>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/home" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/sentiment_analyzer" class="menu-item active">
+                <i class="fas fa-search"></i>
+                <span>Analyze</span>
+            </a>
+            <a href="/visualize" class="menu-item">
+                <i class="fas fa-chart-pie"></i>
+                <span>Visualize</span>
+            </a>
+            <a href="https://www.tweepy.org/" class="menu-item">
+                <i class="fas fa-question-circle"></i>
+                <span>Help</span>
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            <a href="/logout" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sign Out</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Demo Mode Banner -->
+        <div class="demo-mode-banner">
+            <i class="fas fa-info-circle"></i> DEMO MODE: Using simulated tweet data. Twitter API access requires a paid subscription.
+        </div>
+
+        <!-- Content Header -->
+        <div class="content-header">
+            <h2>Tweet Sentiment Analysis</h2>
+            <p>Analyze public opinion on any topic through simulated tweets</p>
+        </div>
+
+        <!-- Search Form Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Search Parameters</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" action="sentiment_logic">
+                    <div class="form-group">
+                        <label for="keyword"><i class="fas fa-tag"></i> Enter your search keyword</label>
+                        <input type="text" class="form-control" id="keyword" name="keyword" placeholder="e.g. iPhone, Tesla, Netflix">
+                    </div>
+                    <div class="form-group">
+                        <label for="tweets"><i class="fas fa-list-ol"></i> Number of tweets to analyze</label>
+                        <input type="number" class="form-control" id="tweets" name="tweets" placeholder="Enter a number (10-100 recommended)" min="1" max="100" value="20">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Analyze Sentiment
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {% if polarity %}
+        <!-- Results Section -->
+        <div class="results-section">
+            <!-- Overall Sentiment Card -->
+            <div class="result-card">
+                <div class="result-card-header">
+                    <h3>Overall Sentiment</h3>
+                </div>
+                <div class="result-card-body">
+                    <p>Based on {{tweets}} tweets about "{{keyword}}"</p>
+                    <div class="sentiment-value">{{htmlpolarity}}</div>
+                </div>
+            </div>
+
+            <!-- Polarity Card -->
+            <div class="result-card">
+                <div class="result-card-header">
+                    <h3>Sentiment Polarity</h3>
+                </div>
+                <div class="result-card-body">
+                    <p>Numerical sentiment score</p>
+                    <div class="sentiment-value">{{polarity}}</div>
+                    <p>(Range: -1 to +1)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Report Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Detailed Sentiment Breakdown</h3>
+            </div>
+            <div class="card-body">
+                <h2 class="report-text"><i class="fas fa-smile" style="color: #4CAF50;"></i> {{spositive}}% people thought it was strongly positive</h2>
+                <h2 class="report-text"><i class="fas fa-smile-beam" style="color: #8BC34A;"></i> {{positive}}% people thought it was positive</h2>
+                <h2 class="report-text"><i class="fas fa-meh-rolling-eyes" style="color: #CDDC39;"></i> {{wpositive}}% people thought it was weakly positive</h2>
+                <h2 class="report-text"><i class="fas fa-meh" style="color: #FFC107;"></i> {{neutral}}% people thought it was neutral</h2>
+                <h2 class="report-text"><i class="fas fa-frown-open" style="color: #FF9800;"></i> {{wnegative}}% people thought it was weakly negative</h2>
+                <h2 class="report-text"><i class="fas fa-frown" style="color: #FF5722;"></i> {{negative}}% people thought it was negative</h2>
+                <h2 class="report-text"><i class="fas fa-angry" style="color: #F44336;"></i> {{snegative}}% people thought it was strongly negative</h2>
+            </div>
+        </div>
+
+        <!-- Visualization Button -->
+        <div class="viz-btn-container">
+            <a href="visualize" class="viz-btn">
+                <i class="fas fa-chart-pie"></i> Generate Visualization
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</body>
+</html>

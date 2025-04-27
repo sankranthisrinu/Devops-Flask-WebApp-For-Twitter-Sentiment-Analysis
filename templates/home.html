@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sentiment Analysis Dashboard</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: #f0f2f5;
+            overflow-x: hidden;
+            display: flex;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-header h3 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-header p {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        
+        .sidebar-menu {
+            margin-top: 20px;
+            flex-grow: 1;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255,255,255,0.2);
+            border-left: 4px solid #ff9800;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 15px;
+            font-size: 20px;
+        }
+        
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,0,0,0.2);
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,0,0,0.4);
+        }
+        
+        .logout-btn i {
+            margin-right: 10px;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .welcome-header {
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .welcome-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        /* Feature Cards */
+        .features-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .feature-img {
+            height: 200px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-img-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+        
+        .feature-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .feature-content {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .feature-content h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .feature-content p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .feature-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .feature-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(75, 108, 183, 0.3);
+        }
+        
+        /* Workflow Card */
+        .workflow-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .workflow-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .workflow-header h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .workflow-steps {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: #73AD21;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex-grow: 1;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                overflow: hidden;
+            }
+            
+            .sidebar-header h3, .sidebar-header p, .sidebar-menu span {
+                display: none;
+            }
+            
+            .sidebar-menu a {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .sidebar-menu i {
+                margin-right: 0;
+            }
+            
+            .logout-btn span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Sentiment AI</h3>
+            <p>Tweet Analyzer</p>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/home" class="menu-item active">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/sentiment_analyzer" class="menu-item">
+                <i class="fas fa-search"></i>
+                <span>Analyze</span>
+            </a>
+            <a href="/visualize" class="menu-item">
+                <i class="fas fa-chart-pie"></i>
+                <span>Visualize</span>
+            </a>
+            <a href="https://www.tweepy.org/" class="menu-item">
+                <i class="fas fa-question-circle"></i>
+                <span>Help</span>
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            <a href="/logout" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sign Out</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Welcome Header -->
+        <div class="welcome-header">
+            {% if session['user_id'] %}
+            <h1>Welcome, {{session['user_id']}}!</h1>
+            {% else %}
+            <h1>Welcome to Sentiment AI!</h1>
+            {% endif %}
+            <p>Discover what people are saying about any topic with our advanced sentiment analysis tool</p>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="features-container">
+            <!-- Get Started Card -->
+            <div class="feature-card">
+                <div class="feature-img">
+                    <img src="/static/images/analysis.jpeg" alt="Get Started">
+                    <div class="feature-img-overlay"></div>
+                </div>
+                <div class="feature-content">
+                    <h3>Let's Get Started!</h3>
+                    <p>Begin analyzing sentiment on any topic with just a few clicks</p>
+                    <a href="/sentiment_analyzer" class="feature-btn">
+                        <i class="fas fa-search"></i> Analyze Tweets
+                    </a>
+                </div>
+            </div>
+
+            <!-- How It Works Card -->
+            <div class="feature-card">
+                <div class="feature-img">
+                    <img src="/static/images/hdw.png" alt="How It Works">
+                    <div class="feature-img-overlay"></div>
+                </div>
+                <div class="feature-content">
+                    <h3>How Does This Work?</h3>
+                    <p>Learn about the technology behind our sentiment analysis engine</p>
+                    <a href="https://www.tweepy.org/" class="feature-btn">
+                        <i class="fas fa-info-circle"></i> Learn More
+                    </a>
+                </div>
+            </div>
+
+            <!-- Visualize Card -->
+            <div class="feature-card">
+                <div class="feature-img">
+                    <img src="/static/images/vis.png" alt="Visualization">
+                    <div class="feature-img-overlay"></div>
+                </div>
+                <div class="feature-content">
+                    <h3>Visualize Results</h3>
+                    <p>See beautiful charts and graphs of your sentiment analysis</p>
+                    <a href="/visualize" class="feature-btn">
+                        <i class="fas fa-chart-pie"></i> View Visualizations
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Card -->
+        <div class="workflow-card">
+            <div class="workflow-header">
+                <h2>How to Use Sentiment AI</h2>
+                <p>Follow these simple steps to analyze sentiment on any topic</p>
+            </div>
+            <div class="workflow-steps">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">Enter a keyword of your choice (e.g., "iPhone", "Climate Change", "Tesla")</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">Specify the number of tweets you want to analyze (10-100)</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">Click "Analyze" and see instant sentiment results!</div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">Click "Generate Visualization" to view detailed data visualization</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</body>
+</html>
