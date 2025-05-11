@@ -8,7 +8,7 @@ image:
   repository: srinu17/sentiment-app
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "14958366169"
+  tag: "14958519570"
 
 ingress:
   enabled: false
